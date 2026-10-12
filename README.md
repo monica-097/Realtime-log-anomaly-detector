@@ -1,62 +1,80 @@
 
 # Real-Time Web Log Anomaly Detector
 
-A Python-based application that analyzes web server access logs, identifies potentially unusual request patterns using rule-based detection, and displays results through an interactive web dashboard.
+A Python-based application that analyzes web server access logs, identifies potentially suspicious request patterns using rule-based detection, and presents results through an interactive web dashboard.
 
-The project combines data processing, rule-based logic, CSV reporting, and a Streamlit interface to demonstrate practical software development skills.
+The project combines log processing, rule-based analysis, automated testing, CSV reporting, and data visualization to demonstrate practical software development skills.
 
 ## Project Overview
 
-Applications generate logs that contain useful information about requests, response codes, timestamps, and source IP addresses. Manually reviewing large numbers of log entries can be time-consuming and make unusual patterns difficult to identify.
+Web server access logs contain useful information about HTTP requests, response codes, timestamps, and source IP addresses. Manually reviewing log entries can be time-consuming and make unusual patterns difficult to identify.
 
-This project automates selected log analysis tasks by processing access-log entries, applying predefined detection rules, and presenting the results in an interactive dashboard.
+This project automates selected log analysis tasks by processing access-log entries, applying predefined detection rules, and presenting the results through an interactive dashboard.
 
-The project demonstrates practical concepts in Python programming, data processing, application development, debugging, data visualization, and structured problem-solving.
+The application demonstrates Python programming, file handling, data processing, application development, testing, debugging, data visualization, and structured problem-solving.
 
 ## Key Features
 
 ### 1. Log Processing and Analysis
-- Reads supported web server access-log files.
-- Extracts relevant information from log entries.
-- Analyzes HTTP requests and response codes.
-- Processes sample data for testing and demonstration.
 
-### 2. Rule-Based Pattern Detection
-- Identifies repeated authentication failures when supported by the implemented detection rules.
-- Flags requests targeting potentially sensitive paths when supported by the detection engine.
-- Generates structured alerts for further review.
-- Uses configurable or predefined conditions to identify selected patterns, depending on the implementation.
+- Parses supported web server access-log entries.
+- Extracts relevant information, including source IP addresses, request paths, timestamps, and HTTP response codes.
+- Processes sample log data for testing and demonstration.
+- Handles invalid log entries according to the implemented parsing logic.
+
+### 2. Rule-Based Anomaly Detection
+
+- Detects repeated HTTP 401/403 authentication failures from a single IP address within a defined time window.
+- Identifies repeated HTTP 404 responses that may indicate path scanning.
+- Flags requests to potentially sensitive paths, such as `/.env`.
+- Tracks activity from different source IP addresses independently.
+- Applies alert cooldown logic to reduce duplicate alerts.
+- Generates structured detection results for further investigation.
+
+Detection thresholds and time windows depend on the implemented rules and available command-line options.
 
 ### 3. Interactive Web Dashboard
+
 - Built using Streamlit.
 - Displays summary metrics and recent alert records.
 - Visualizes alert severity and counts using Plotly.
 - Organizes results into separate sections for easier navigation.
-- Provides an interface for reviewing analysis results.
+- Provides an interface for reviewing detection results.
 
 ### 4. Alert Review and Investigation
-- Displays generated results in a tabular format.
-- Supports selecting and reviewing individual alert records.
-- Provides a checklist to organize the review of timestamps, source IP addresses, endpoints, and HTTP response codes.
+
+- Displays generated alerts in a tabular format.
+- Supports reviewing individual alert records.
+- Provides an investigation checklist covering timestamps, source IP addresses, request paths, and HTTP response codes.
+- Helps organize follow-up analysis of potentially unusual activity.
 
 ### 5. CSV Reporting
-- Exports detection results to `alerts.csv`.
-- Makes results available for further analysis using spreadsheet software or other CSV-compatible tools.
-- Separates analysis output from the dashboard interface.
 
-### 6. Testing and Documentation
-- Includes sample log data for demonstration.
-- Provides a workflow for running the detection engine and reviewing its output.
-- Documents setup instructions, supported functionality, limitations, and potential improvements.
+- Exports detection results to `alerts.csv`.
+- Stores structured output for further analysis.
+- Supports reviewing results using spreadsheet software or other CSV-compatible tools.
+
+### 6. Automated Testing
+
+- Includes unit tests written with pytest.
+- Tests valid and invalid log parsing.
+- Verifies authentication-failure detection thresholds.
+- Tests time-window handling.
+- Tests repeated HTTP 404 responses and sensitive-path detection.
+- Checks alert cooldown behavior.
+- Verifies independent tracking of source IP addresses.
+
+The test suite is intended to validate specific behaviors of the detection engine.
 
 ## Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Application logic, log processing, and rule-based analysis |
-| Streamlit | Interactive web application and dashboard |
+| Python | Application logic, log processing, and detection rules |
+| Streamlit | Interactive web dashboard |
 | Pandas | Tabular data processing and analysis |
 | Plotly | Interactive data visualization |
+| pytest | Automated unit testing |
 | CSV | Structured output and reporting |
 | Git and GitHub | Version control and source code hosting |
 
@@ -65,10 +83,11 @@ The project demonstrates practical concepts in Python programming, data processi
 ```text
 realtime-log-anomaly-detector/
 ├── detector.py
+├── test_detector.py
 ├── dashboard.py
 ├── sample_access.log
-├── alerts.csv
 ├── requirements.txt
+├── alerts.csv
 ├── README.md
 └── .gitignore
 ```
@@ -76,10 +95,11 @@ realtime-log-anomaly-detector/
 ## File Descriptions
 
 - `detector.py` — Processes access logs and applies the implemented detection rules.
-- `dashboard.py` — Provides the web interface, visualizations, result review, and supporting documentation.
-- `sample_access.log` — Contains sample data for testing and demonstration.
-- `alerts.csv` — Stores generated detection results when the detection engine runs.
-- `requirements.txt` — Lists the Python packages required by the application.
+- `test_detector.py` — Contains automated unit tests for the detection engine.
+- `dashboard.py` — Provides the web interface, visualizations, alert review, and supporting documentation.
+- `sample_access.log` — Contains sample log entries for testing and demonstration.
+- `requirements.txt` — Lists the Python packages required by the project.
+- `alerts.csv` — Stores generated detection results when the detector runs.
 - `README.md` — Contains project documentation and setup instructions.
 - `.gitignore` — Specifies files that should be excluded from version control.
 
@@ -107,13 +127,13 @@ On Windows:
 py -m pip install -r requirements.txt
 ```
 
-Alternatively, if Python is available through the `python` command:
+Alternatively, on systems where the `python` command is configured:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 3. Run the Analysis
+### 3. Run the Detection Engine
 
 On Windows:
 
@@ -121,9 +141,19 @@ On Windows:
 py detector.py sample_access.log --alerts alerts.csv
 ```
 
-The application processes the sample log and writes the resulting detection records to `alerts.csv` if execution completes successfully.
+The detector processes the sample log and writes the resulting detection records to `alerts.csv` if execution completes successfully.
 
-### 4. Launch the Web Dashboard
+### 4. Run the Unit Tests
+
+Execute the test suite using:
+
+```powershell
+py -m pytest -v
+```
+
+Pytest displays the individual test results and reports the total number of passed or failed tests.
+
+### 5. Launch the Dashboard
 
 ```powershell
 py -m streamlit run dashboard.py
@@ -141,56 +171,87 @@ http://localhost:8501
 4. Output — Generate structured detection results and save them to a CSV file.
 5. Visualization — Display summary metrics, charts, and records through the dashboard.
 6. Review — Examine selected records and investigate potentially unusual patterns.
+7. Testing — Run automated tests to verify supported behaviors of the detection engine.
+
+## Detection and Investigation Approach
+
+The detection engine uses rule-based logic to identify patterns that match the rules implemented in `detector.py`.
+
+The intended detection scenarios include repeated authentication failures, repeated HTTP 404 responses, and requests targeting potentially sensitive paths.
+
+Thresholds, time windows, alert severity, cooldown behavior, and output fields depend on the current implementation and its configuration.
+
+These patterns may indicate suspicious activity, but they are not definitive proof of an attack. Legitimate users and automated services can also generate unusual request patterns. Detection results should be validated using the original logs and other available evidence.
 
 ## Testing
 
-Use `sample_access.log` to test the application workflow.
+The project includes a pytest-based unit test suite.
 
-Recommended checks:
+Run all tests using:
 
-1. Run the detection engine and confirm successful execution.
-2. Verify that `alerts.csv` is generated or updated.
-3. Review the generated records.
-4. Launch the dashboard and check whether the displayed metrics match the available data.
-5. Test additional log files containing known patterns.
-6. Compare the results against expected outputs to identify incorrect detections or missed cases.
+```powershell
+py -m pytest -v
+```
 
-A successful execution confirms that the tested workflow runs; it does not, by itself, establish detection accuracy or performance.
+The test suite covers:
+
+- Parsing valid log entries and rejecting invalid entries.
+- Detecting authentication failures at the configured threshold.
+- Avoiding an alert when the number of failures is below the threshold.
+- Handling failures that occur outside the configured time window.
+- Detecting repeated HTTP 404 responses.
+- Identifying requests to sensitive paths such as `/.env`.
+- Suppressing duplicate alerts through cooldown logic.
+- Tracking different source IP addresses independently.
+
+If the test suite contains nine tests, pytest should report nine test results. The actual outcome must be confirmed by running the tests against the current implementation.
+
+Passing unit tests validates the behaviors covered by those tests. It does not independently establish overall detection accuracy, precision, recall, or false-positive rate.
 
 ## Skills Demonstrated
 
-- Python programming and application logic
-- File handling and text processing
-- Data transformation and tabular data analysis
-- Rule-based logic and conditional processing
-- Web application development
-- Interactive data visualization
-- CSV reporting and output validation
-- Debugging and functional testing
-- Git-based version control
-- Technical documentation
+- Python programming and application logic.
+- File handling and text processing.
+- Data parsing and transformation.
+- Rule-based analysis and conditional logic.
+- Web application development.
+- Interactive data visualization.
+- CSV reporting and output validation.
+- Automated testing with pytest.
+- Debugging and functional verification.
+- Git-based version control.
+- Technical documentation.
 
 ## Limitations and Future Improvements
 
-The current application depends on predefined detection rules and may produce false positives or miss patterns that are not covered by those rules.
+The application depends on predefined detection rules and may produce false positives or miss patterns that are not covered by those rules.
 
 Potential improvements include:
 
 - Support for additional log formats.
 - Configurable detection thresholds.
-- More filtering and search options.
-- Improved error handling and automated testing.
+- Improved filtering and search options.
+- More robust error handling.
+- Additional automated tests with expected outcomes.
 - Performance improvements for large log files.
-- Additional visualizations and time-based trend analysis.
+- Time-based trends and enhanced visualizations.
 - Evaluation using labeled test data.
 - Optional machine-learning-based anomaly detection.
 - Persistent storage and enhanced reporting features.
 
-These items are potential future enhancements, not claims about existing functionality.
+These are potential future enhancements, not claims about existing functionality.
+
+## Security Considerations
+
+- Analyze only logs that you own or are authorized to inspect.
+- Use synthetic or sanitized log data in public repositories.
+- Do not commit credentials, API tokens, private logs, or other sensitive information.
+- Treat generated alerts as indicators for investigation rather than definitive proof of malicious activity.
+- Review data handling and access controls before deploying the application for shared use.
 
 ## Disclaimer
 
-This project was developed for educational purposes and portfolio demonstration. Detection results should be reviewed and validated before being used to make operational decisions.
+This project was developed for educational purposes and portfolio demonstration. It is not a replacement for a production monitoring or incident-response platform. Detection results require appropriate validation before being used to make operational decisions.
 
 ## Author
 
